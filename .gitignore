@@ -1,4 +1,5 @@
 ADNI/
 NeuroEnv/
 MNI Atlas/
-Alzheimer's Code/testing.py
+testing.py
+__pycache__
