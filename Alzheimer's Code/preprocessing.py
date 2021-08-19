@@ -14,7 +14,7 @@ import os.path
 import nibabel as nib
 import matplotlib.pyplot
 import constants
-import dltk
+import dltk.io.preprocessing
 from nipype.interfaces.fsl import BET
 
 
@@ -125,22 +125,11 @@ def register_images():
                         except RuntimeError:
                             print('Exception with', os.path.join(path, file))
 
-# whitening function taken from DLTK, normalises image to zero mean and unit variance
-def whiten_img(img):
-    img = img.astype(np.float32)
-    mean = np.mean(img)
-    std = np.std(img)
-
-    if std > 0:
-        ret = (image - mean) /std
-    else:
-        ret = image * 0.
-    return ret
 
 # conversion algorithm consists of taking 16 horizontal sliced and placing them in a 4x4 grid
 # slices are taken at levels that provide the most information about the brain 
 def convert_to_2D(img):
-    img_2D = np.empty(440, 344) # 2D image shape is derived from the shape of the remaining planes of the 3D image * 4
+    img_2D = np.empty((440, 344)) # 2D image shape is derived from the shape of the remaining planes of the 3D image * 4
 
     # set the cutting upper and lower limit, cuts will be between 30 and 60
     top = 60
@@ -161,21 +150,27 @@ def convert_to_2D(img):
             col_iterator += cut.shape[1]
 
         # copy over the cut into the 2D image array, pixel by pixel
-        for i in range(cut[0]):
-            for j in range(cut[1]):
+        for i in range(cut.shape[0]):
+            for j in range(cut.shape[1]):
                 img_2D[i + row_iterator, j + col_iterator] = cut[i, j]
         row_iterator += cut.shape[0]
+    
+    pltshow = plt.imshow(img_2D)
+    plt.show()
 
-    return np.repeat(img_2D[None, ...])
+    return np.repeat(img_2D[None, ...], 3, axis = 0).T
 
 def load_2D_image(img_path):
     label = (img_path.split('/')[-2])
     sitk_img = sitk.ReadImage(img_path)
     img = sitk.GetArrayFromImage(sitk_img)
-    img = whiten_img(img)
+    img = dltk.io.preprocessing.whitening(img)
 
     img = convert_to_2D(img)
-
+    print(img)
+    pltimage=plt.imshow(img)
+    plt.show()
     return img, label
 
 
+load_2D_image('/content/gdrive/MyDrive/ADNI/ADNI_002_S_0413_MR_MPR____N3__Scaled_Br_20070216232854688_S14782_I40657.nii')
