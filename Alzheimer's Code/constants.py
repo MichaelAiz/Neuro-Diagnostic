@@ -16,17 +16,20 @@ TFRECORD_VAL = "validation.tfrecords"
 # Drive Constants
 REGISTERED_DB_DRIVE = ""
 CLASS_SUBFOLDERS = ""
-TFRECORD_DB_DRIVE = ""
-TFRECORD_TRAIN_DRIVE = ""
-TFRECORD_TEST_DRIVE = ""
-TFRECORD_VAL_DRIVE = ""
+TFRECORD_DB_DRIVE = "/content/drive/MyDrive/Neuro-Diagnostic/TFRecords"
+TFRECORD_TRAIN_DRIVE = "/content/drive/MyDrive/Neuro-Diagnostic/TFRecords/train.tfrecords"
+TFRECORD_TEST_DRIVE = "/content/drive/MyDrive/Neuro-Diagnostic/TFRecords/validation.tfrecords"
+TFRECORD_VAL_DRIVE = "/content/drive/MyDrive/Neuro-Diagnostic/TFRecords/test.tfrecords"
 
 # Tensorflow Constants
 AUTOTUNE = tf.data.AUTOTUNE
-BATCH_SIZE = 32
+BATCH_SIZE = 8
+TRAIN_SIZE = 891
+VAL_SIZE = 191
+TEST_SIZE = 191
 
 # Other constants
-LABELS = {'CN': 0, 'MCI': 1, 'AD': 2} 
+LABEL_MAP = {'CN': 0, 'MCI': 1, 'AD': 2} 
 IMG_SHAPE = (78, 110, 86)
 IMG_2D_SHAPE = (440, 344)
 TEST_SPLIT = 0.15

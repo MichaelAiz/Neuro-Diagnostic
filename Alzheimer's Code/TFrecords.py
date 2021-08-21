@@ -50,7 +50,7 @@ def write_to_tf_record(filenames, record_name):
 
         # create feature mapping for the Example
         features = {
-            'label': _bytes_feature(bytes(label, 'utf-8')),
+            'label': _int64_feature(label),
             'height': _int64_feature(img.shape[1]),
             'width': _int64_feature(img.shape[0]),
             'depth': _int64_feature(img.shape[2]),
@@ -64,10 +64,12 @@ def write_to_tf_record(filenames, record_name):
     writer.close()
 
 # parse a single TFRecord example
+
+
 def parse_tfr_example(element):
     # create a dictionary describing the features
     example_features = {
-        'label': tf.io.FixedLenFeature([], tf.string),
+        'label': tf.io.FixedLenFeature([], tf.int64),
         'height': tf.io.FixedLenFeature([], tf.int64),
         'width': tf.io.FixedLenFeature([], tf.int64),
         'depth': tf.io.FixedLenFeature([], tf.int64),
@@ -93,22 +95,18 @@ def parse_tfr_example(element):
 def create_tfrecord_dataset(filename, set_type):
     raw_dataset = tf.data.TFRecordDataset(filename)
     # parse every example in the dataset
-    dataset = raw_dataset.map(parse_tfr_example, num_parallel_calls=constants.AUTOTUNE) # let the runtime decide on optimal number of parallel calls
+    # let the runtime decide on optimal number of parallel calls
+    dataset = raw_dataset.map(
+        parse_tfr_example, num_parallel_calls=constants.AUTOTUNE)
     # set the batch size, this is the number of samples the model will process before making adjustments
     dataset = dataset.batch(constants.BATCH_SIZE)
-    dataset = dataset.prefetch(buffer_size=constants.AUTOTUNE) # let runtime decide on optimal prefetch to increase performance
+    # let runtime decide on optimal prefetch to increase performance
+    dataset = dataset.prefetch(buffer_size=constants.AUTOTUNE)
     dataset = dataset.repeat() if set_type == 'train' else dataset
     return dataset
 
 
-
-filenames = ['E:/Projects/Neuro-Diagnostic/TFRecords/test.tfrecords']
-
-create_tfrecord_dataset(
-    'E:/Projects/Neuro-Diagnostic/TFRecords/test.tfrecords')
-
-
-filenames = np.array([]) # array to store all registered images
+filenames = np.array([])  # array to store all registered images
 
 
 # add all files from folders to filenames array
@@ -124,7 +122,9 @@ train_set, test_set = train_test_split(filenames, train_size=0.70)
 test_set, val_set = train_test_split(test_set, train_size=0.5)
 
 
-def write_tf_records(train_set, tfrecord_train, val_set, tfrecord_val, test_set, tfrecord_test):
+
+def write_tf_records():
     write_to_tf_record(train_set, tfrecord_train)
     write_to_tf_record(val_set, tfrecord_val)
     write_to_tf_record(test_set, tfrecord_test)
+

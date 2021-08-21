@@ -159,7 +159,7 @@ def convert_to_2D(img):
     return np.repeat(img_2D[None, ...], 3, axis = 0).T
 
 def load_2D_image(img_path):
-    label = (img_path.split('/')[-2])
+    label = constants.LABEL_MAP[(img_path.split('/')[-2])]
     sitk_img = sitk.ReadImage(img_path)
     img = sitk.GetArrayFromImage(sitk_img)
     img = dltk.io.preprocessing.whitening(img)
