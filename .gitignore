@@ -1,5 +1,6 @@
-ADNI/
-NeuroEnv/
-MNI Atlas/
+ADNI
+NeuroEnv
+MNI Atlas
 testing.py
 __pycache__
+TFRecords

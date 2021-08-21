@@ -1,6 +1,6 @@
 # This file contains the main steps used to process the ADNI images and organize them into folders based on their labels
 
-from itk.support.extras import image
+from itk.support.extras import image, imread
 import numpy as np
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
@@ -15,9 +15,9 @@ import nibabel as nib
 import matplotlib.pyplot
 import constants
 import dltk.io.preprocessing
+import dltk.io.augmentation
 from nipype.interfaces.fsl import BET
-
-
+from PIL import Image
 
 # image is resampled to a common isotropic resolution of 2mm^3
 # remember to read in image using simpleitk
@@ -155,8 +155,6 @@ def convert_to_2D(img):
                 img_2D[i + row_iterator, j + col_iterator] = cut[i, j]
         row_iterator += cut.shape[0]
     
-    pltshow = plt.imshow(img_2D)
-    plt.show()
 
     return np.repeat(img_2D[None, ...], 3, axis = 0).T
 
@@ -167,10 +165,7 @@ def load_2D_image(img_path):
     img = dltk.io.preprocessing.whitening(img)
 
     img = convert_to_2D(img)
-    print(img)
-    pltimage=plt.imshow(img)
-    plt.show()
+    print("Next Image")
     return img, label
 
 
-load_2D_image('/content/gdrive/MyDrive/ADNI/ADNI_002_S_0413_MR_MPR____N3__Scaled_Br_20070216232854688_S14782_I40657.nii')
