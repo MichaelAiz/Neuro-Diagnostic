@@ -9,9 +9,9 @@ ATLAS = 'E:/Projects/Neuro-Diagnostic/MNI Atlas/average305_t1_tal_lin.nii'
 TFRECORD_PATH = 'E:/Projects/Neuro-Diagnostic/TFRecords/'
 SUBFOLDERS = ['CN', 'MCI', 'AD']
 TFRECORD_DB = "E:/Projects/Neuro-Diagnostic/ADNI/TFRecords"
-TFRECORD_TRAIN = "train.tfrecords"
-TFRECORD_TEST = "test.tfrecords"
-TFRECORD_VAL = "validation.tfrecords"
+TFRECORD_TRAIN = "E:/Projects/Neuro-Diagnostic/TFRecords/train.tfrecords"
+TFRECORD_TEST = "E:/Projects/Neuro-Diagnostic/TFRecords/test.tfrecords"
+TFRECORD_VAL = "E:/Projects/Neuro-Diagnostic/TFRecords/validation.tfrecords"
 
 # Drive Constants
 REGISTERED_DB_DRIVE = ""

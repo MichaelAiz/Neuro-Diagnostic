@@ -118,12 +118,13 @@ for path, dirs, files in os.walk(constants.REGISTERED_DB):
 
 # split the filenames array into training, validation, and testing sets
 # 70% of images go to training set, 15% to both validation and testing
-train_set, test_set = train_test_split(filenames, train_size=0.70)
-test_set, val_set = train_test_split(test_set, train_size=0.5)
 
 
 
-def write_tf_records():
+
+def write_tf_records(filenames):
+    train_set, test_set = train_test_split(filenames, train_size=0.70)
+    test_set, val_set = train_test_split(test_set, train_size=0.5)
     write_to_tf_record(train_set, tfrecord_train)
     write_to_tf_record(val_set, tfrecord_val)
     write_to_tf_record(test_set, tfrecord_test)
