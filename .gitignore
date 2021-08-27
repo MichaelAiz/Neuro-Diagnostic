@@ -5,3 +5,4 @@ testing.py
 __pycache__
 TFRecords
 Models
+templates

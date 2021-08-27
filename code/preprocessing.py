@@ -1,6 +1,6 @@
 # This file contains the main steps used to process the ADNI images and organize them into folders based on their labels
 
-from itk.support.extras import image, imread
+from constants import ATLAS
 import numpy as np
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
@@ -13,17 +13,17 @@ import numpy as np
 import os.path
 import nibabel as nib
 import matplotlib.pyplot
-import constants
 import dltk.io.preprocessing
 import dltk.io.augmentation
 from nipype.interfaces.fsl import BET
 from PIL import Image
+import constants
 
 # image is resampled to a common isotropic resolution of 2mm^3
 # remember to read in image using simpleitk
-def resample_img(itk_image, out_spacing=[2.0, 2.0, 2.0]):
-    original_spacing = itk_image.GetSpacing()
-    original_size = itk_image.GetSize()
+def resample_img(sitk_image, out_spacing=[2.0, 2.0, 2.0]):
+    original_spacing = sitk_image.GetSpacing()
+    original_size = sitk_image.GetSize()
 
     out_size = [
         int(np.round(original_size[0] * (original_spacing[0] / out_spacing[0]))),
@@ -34,14 +34,14 @@ def resample_img(itk_image, out_spacing=[2.0, 2.0, 2.0]):
     resample = sitk.ResampleImageFilter()
     resample.SetOutputSpacing(out_spacing)
     resample.SetSize(out_size)
-    resample.SetOutputDirection(itk_image.GetDirection())
-    resample.SetOutputOrigin(itk_image.GetOrigin())
+    resample.SetOutputDirection(sitk_image.GetDirection())
+    resample.SetOutputOrigin(sitk_image.GetOrigin())
     resample.SetTransform(sitk.Transform())
-    resample.SetDefaultPixelValue(itk_image.GetPixelIDValue())
+    resample.SetDefaultPixelValue(sitk_image.GetPixelIDValue())
     resample.SetInterpolator(sitk.sitkBSpline)
 
 
-    return resample.Execute(itk_image)
+    return resample.Execute(sitk_image)
 
 # convert a SimpleITK image to an ITK image via a numpy array, preserving metadata
 def sitk_to_itk(sitk_image):
@@ -158,7 +158,7 @@ def convert_to_2D(img):
 
     return np.repeat(img_2D[None, ...], 3, axis = 0).T
 
-def load_2D_image(img_path):
+def load_2D_with_label(img_path):
     label = constants.LABEL_MAP[(img_path.split('/')[-2])]
     sitk_img = sitk.ReadImage(img_path)
     img = sitk.GetArrayFromImage(sitk_img)
@@ -168,4 +168,22 @@ def load_2D_image(img_path):
     print("Next Image")
     return img, label
 
+def load_2D_no_label(sitk_image):
+    img = sitk.GetArrayFromImage(sitk_image)
+    img = dltk.io.preprocessing.whitening(img)
+    return convert_to_2D(img)
+
+def process_single_img(file):
+    sitk_img = sitk.ReadImage(file)
+    resampled_sitk = resample_img(sitk_img)
+    sitk_atlas = sitk.ReadImage(ATLAS)
+    resampled_atlas = resample_img(sitk_atlas)
+    registered_itk = register_img(resampled_sitk, resampled_atlas)
+    registered_sitk = itk_to_sitk(registered_itk)
+    image_2D = load_2D_no_label(registered_sitk)
+    image_2D = np.reshape(image_2D, (440, 344, 3))
+    image_2D = np.expand_dims(image_2D, axis=0)
+    return image_2D
+
+#process_single_img('E:/Projects/Neuro-Diagnostic/ADNI/Registered/AD/ADNI_141_S_1024_MR_MPR__GradWarp__B1_Correction__N3__Scaled_Br_20070402181417383_S22699_I47748.nii')
 

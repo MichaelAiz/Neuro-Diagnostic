@@ -13,14 +13,6 @@ TFRECORD_TRAIN = "E:/Projects/Neuro-Diagnostic/TFRecords/train.tfrecords"
 TFRECORD_TEST = "E:/Projects/Neuro-Diagnostic/TFRecords/test.tfrecords"
 TFRECORD_VAL = "E:/Projects/Neuro-Diagnostic/TFRecords/validation.tfrecords"
 
-# Drive Constants
-REGISTERED_DB_DRIVE = ""
-CLASS_SUBFOLDERS = ""
-TFRECORD_DB_DRIVE = "/content/drive/MyDrive/Neuro-Diagnostic/TFRecords"
-TFRECORD_TRAIN_DRIVE = "/content/drive/MyDrive/Neuro-Diagnostic/TFRecords/train.tfrecords"
-TFRECORD_TEST_DRIVE = "/content/drive/MyDrive/Neuro-Diagnostic/TFRecords/validation.tfrecords"
-TFRECORD_VAL_DRIVE = "/content/drive/MyDrive/Neuro-Diagnostic/TFRecords/test.tfrecords"
-
 # Tensorflow Constants
 AUTOTUNE = tf.data.AUTOTUNE
 BATCH_SIZE = 8

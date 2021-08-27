@@ -1,3 +1,4 @@
+from constants import AUTOTUNE
 import tensorflow as tf
 import SimpleITK as sitk
 import numpy as np
@@ -91,6 +92,24 @@ def parse_tfr_example(element):
 
     return (image, label)
 
+
+def class_func(features, label):
+    return label
+
+resampler = tf.data.experimental.rejection_resample(class_func, target_dist=[0.30, 0.30, 0.40])
+
+
+def augment(image_label, seed):
+    image, label = image_label
+    image = tf.image.stateless_random_crop(image, size = [440, 344, 3], seed=seed)
+    print('may have augmented')
+    return image, label
+rng = tf.random.Generator.from_seed(123, alg='philox')
+def f(x,y):
+    seed = rng.make_seeds(2)[0]
+    image, label = augment((x,y), seed)
+    return image, label
+
 # create a dataset from the TFRecords
 def create_tfrecord_dataset(filename, set_type):
     raw_dataset = tf.data.TFRecordDataset(filename)
@@ -98,12 +117,18 @@ def create_tfrecord_dataset(filename, set_type):
     # let the runtime decide on optimal number of parallel calls
     dataset = raw_dataset.map(
         parse_tfr_example, num_parallel_calls=constants.AUTOTUNE)
+    if set_type == 'train' or set_type == 'val':
+        dataset = dataset.apply(resampler)
+        dataset = dataset.map(lambda extra_label, features_and_label: features_and_label)
+        # dataset = dataset.map(f, num_parallel_calls=AUTOTUNE)
     # set the batch size, this is the number of samples the model will process before making adjustments
     dataset = dataset.batch(constants.BATCH_SIZE)
     # let runtime decide on optimal prefetch to increase performance
     dataset = dataset.prefetch(buffer_size=constants.AUTOTUNE)
-    dataset = dataset.repeat() if set_type == 'train' else dataset
+    # if set_type == 'train' or set_type == 'val':
+    #     dataset = dataset.repeat()
     return dataset
+
 
 
 filenames = np.array([])  # array to store all registered images
