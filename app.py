@@ -26,7 +26,7 @@ def scan_alzheimers():
     file = request.files['file']
     filename = file.filename
     file.save(os.path.join('E:/Projects/Neuro-Diagnostic/', filename))
-    img =  preprocessing.process_single_img(os.path.join('E:/Projects/Neuro-Diagnostic/', filename))
+    img = preprocessing.process_single_img(os.path.join('E:/Projects/Neuro-Diagnostic/', filename))
     model = keras.models.load_model('E:/Projects/Neuro-Diagnostic/Models/FineTunedModelNoAugment.h5')
     prediction = model.predict(img)
     return str(np.argmax(prediction))

@@ -1,7 +1,6 @@
 # Local Constants
 import tensorflow as tf
 
-
 DATABASE = 'E:/Projects/Neuro-Diagnostic/ADNI/Original/'
 DB_SUBFOLDERS = ['Complete 2Yr 1.5T/', 'Complete 3Yr 1.5T/', 'Screening_1.5T/']
 REGISTERED_DB = 'E:/Projects/Neuro-Diagnostic/ADNI/Registered/'

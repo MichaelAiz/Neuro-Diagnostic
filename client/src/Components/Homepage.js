@@ -45,8 +45,6 @@ const Homepage = ({ updateScan }) => {
     )
 }
 
-
-
 export default Homepage
 
 

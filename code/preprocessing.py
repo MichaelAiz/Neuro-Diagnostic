@@ -60,6 +60,7 @@ def itk_to_sitk(itk_image):
     return new_sitk_image 
 
 # register image to an atlas, MNI 305 atlas to be used
+# RETURNS AN ITK IMAGE
 def register_img(sitk_fixed, sitk_moving):
     # convert sitk images to itk for registration using ITKElastix
     itk_fixed = sitk_to_itk(sitk_fixed)
@@ -78,7 +79,6 @@ def register_img(sitk_fixed, sitk_moving):
     elastix_object.UpdateLargestPossibleRegion()
     result_image = elastix_object.GetOutput()
     return result_image
-    result_transform_parameters = elastix_object.GetTransformParameterObject()
 
 def register_and_save(filename, path, atlas, description_csv):
     # # seperate filename by "_"
@@ -158,29 +158,40 @@ def convert_to_2D(img):
 
     return np.repeat(img_2D[None, ...], 3, axis = 0).T
 
+
+# loads 2D image with the corresponding label, used for generation of datasets
 def load_2D_with_label(img_path):
     label = constants.LABEL_MAP[(img_path.split('/')[-2])]
     sitk_img = sitk.ReadImage(img_path)
     img = sitk.GetArrayFromImage(sitk_img)
+    # image whitening is applied
     img = dltk.io.preprocessing.whitening(img)
 
     img = convert_to_2D(img)
     print("Next Image")
     return img, label
 
+# generates a 2D image from a preprocessed sitk image, used for running a trained model
 def load_2D_no_label(sitk_image):
     img = sitk.GetArrayFromImage(sitk_image)
     img = dltk.io.preprocessing.whitening(img)
     return convert_to_2D(img)
 
+# processes a single image to feed into a trained model
+# takes in a nii file
 def process_single_img(file):
     sitk_img = sitk.ReadImage(file)
+    # resamples the sitk image
     resampled_sitk = resample_img(sitk_img)
     sitk_atlas = sitk.ReadImage(constants.ATLAS)
+    # resamples sitk atlas
     resampled_atlas = resample_img(sitk_atlas)
+    # registers image
     registered_itk = register_img(resampled_sitk, resampled_atlas)
+    # converts registered image from itk to sitk
     registered_sitk = itk_to_sitk(registered_itk)
     image_2D = load_2D_no_label(registered_sitk)
+    # reshapes image for feeding into model
     image_2D = np.reshape(image_2D, (440, 344, 3))
     image_2D = np.expand_dims(image_2D, axis=0)
     return image_2D

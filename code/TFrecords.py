@@ -35,14 +35,11 @@ def serialize_array(array):
 
 
 # create destination paths for TFrecords
-tfrecord_train = os.path.join(
-    constants.TFRECORD_PATH, constants.TFRECORD_TRAIN)
+tfrecord_train = os.path.join(constants.TFRECORD_PATH, constants.TFRECORD_TRAIN)
 tfrecord_val = os.path.join(constants.TFRECORD_PATH, constants.TFRECORD_VAL)
 tfrecord_test = os.path.join(constants.TFRECORD_PATH, constants.TFRECORD_TEST)
 
 # writes all files in filenames to TFrecord
-
-
 def write_to_tf_record(filenames, record_name):
     writer = tf.io.TFRecordWriter(record_name)
     for file in filenames:
@@ -64,9 +61,29 @@ def write_to_tf_record(filenames, record_name):
 
     writer.close()
 
+
+filenames = np.array([])  # array to store all registered images
+
+
+# add all files from folders to filenames array
+for path, dirs, files in os.walk(constants.REGISTERED_DB):
+    for file in files:
+        fixed_file_path = path + "/"
+        filenames = np.append(filenames, os.path.join(fixed_file_path, file))
+
+
+# split the filenames array into training, validation, and testing sets
+# 70% of images go to training set, 15% to both validation and testing
+# writes TFRecords to file location 
+def write_tf_records(filenames):
+    train_set, test_set = train_test_split(filenames, train_size=0.70)
+    test_set, val_set = train_test_split(test_set, train_size=0.5)
+    write_to_tf_record(train_set, tfrecord_train)
+    write_to_tf_record(val_set, tfrecord_val)
+    write_to_tf_record(test_set, tfrecord_test)
+
+
 # parse a single TFRecord example
-
-
 def parse_tfr_example(element):
     # create a dictionary describing the features
     example_features = {
@@ -93,22 +110,12 @@ def parse_tfr_example(element):
     return (image, label)
 
 
+# define resampler to implement rejection resampling to account for data imbalance
 def class_func(features, label):
     return label
 
 resampler = tf.data.experimental.rejection_resample(class_func, target_dist=[0.30, 0.30, 0.40])
 
-
-def augment(image_label, seed):
-    image, label = image_label
-    image = tf.image.stateless_random_crop(image, size = [440, 344, 3], seed=seed)
-    print('may have augmented')
-    return image, label
-rng = tf.random.Generator.from_seed(123, alg='philox')
-def f(x,y):
-    seed = rng.make_seeds(2)[0]
-    image, label = augment((x,y), seed)
-    return image, label
 
 # create a dataset from the TFRecords
 def create_tfrecord_dataset(filename, set_type):
@@ -117,6 +124,7 @@ def create_tfrecord_dataset(filename, set_type):
     # let the runtime decide on optimal number of parallel calls
     dataset = raw_dataset.map(
         parse_tfr_example, num_parallel_calls=constants.AUTOTUNE)
+    # apply rejection resampling
     if set_type == 'train' or set_type == 'val':
         dataset = dataset.apply(resampler)
         dataset = dataset.map(lambda extra_label, features_and_label: features_and_label)
@@ -130,27 +138,15 @@ def create_tfrecord_dataset(filename, set_type):
     return dataset
 
 
-
-filenames = np.array([])  # array to store all registered images
-
-
-# add all files from folders to filenames array
-for path, dirs, files in os.walk(constants.REGISTERED_DB):
-    for file in files:
-        fixed_file_path = path + "/"
-        filenames = np.append(filenames, os.path.join(fixed_file_path, file))
-
-
-# split the filenames array into training, validation, and testing sets
-# 70% of images go to training set, 15% to both validation and testing
-
-
-
-
-def write_tf_records(filenames):
-    train_set, test_set = train_test_split(filenames, train_size=0.70)
-    test_set, val_set = train_test_split(test_set, train_size=0.5)
-    write_to_tf_record(train_set, tfrecord_train)
-    write_to_tf_record(val_set, tfrecord_val)
-    write_to_tf_record(test_set, tfrecord_test)
+# test augmented function, not implemented
+# def augment(image_label, seed):
+#     image, label = image_label
+#     image = tf.image.stateless_random_crop(image, size = [440, 344, 3], seed=seed)
+#     print('may have augmented')
+#     return image, label
+# rng = tf.random.Generator.from_seed(123, alg='philox')
+# def f(x,y):
+#     seed = rng.make_seeds(2)[0]
+#     image, label = augment((x,y), seed)
+#     return image, label
 
