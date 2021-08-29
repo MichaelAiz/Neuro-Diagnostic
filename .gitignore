@@ -6,3 +6,4 @@ __pycache__
 TFRecords
 Models
 templates
+node_modules

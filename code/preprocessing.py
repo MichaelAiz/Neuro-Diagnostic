@@ -1,6 +1,5 @@
 # This file contains the main steps used to process the ADNI images and organize them into folders based on their labels
 
-from constants import ATLAS
 import numpy as np
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
@@ -17,6 +16,7 @@ import dltk.io.preprocessing
 import dltk.io.augmentation
 from nipype.interfaces.fsl import BET
 from PIL import Image
+import TFrecords
 import constants
 
 # image is resampled to a common isotropic resolution of 2mm^3
@@ -176,7 +176,7 @@ def load_2D_no_label(sitk_image):
 def process_single_img(file):
     sitk_img = sitk.ReadImage(file)
     resampled_sitk = resample_img(sitk_img)
-    sitk_atlas = sitk.ReadImage(ATLAS)
+    sitk_atlas = sitk.ReadImage(constants.ATLAS)
     resampled_atlas = resample_img(sitk_atlas)
     registered_itk = register_img(resampled_sitk, resampled_atlas)
     registered_sitk = itk_to_sitk(registered_itk)

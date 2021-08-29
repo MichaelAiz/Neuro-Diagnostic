@@ -4,20 +4,21 @@ import numpy as np
 import tensorflow as tf
 from tensorflow import keras
 import os
+from flask_cors import CORS
 from flask import Flask, request, flash, redirect, render_template
-from code.preprocessing import process_single_img
+from PIL import Image
+
+
+sys.path.append('E:/Projects/Neuro-Diagnostic/Code/')
+from Code import TFrecords
+from Code import preprocessing
 
 app = Flask(__name__)
+CORS(app)
 
 
 
-
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-
-@app.route('/', methods=['POST'])
+@app.route('/scan', methods=['POST'])
 def scan_alzheimers():
     if 'file' not in request.files:
         app.logger.debug('not found file')
@@ -25,15 +26,11 @@ def scan_alzheimers():
     file = request.files['file']
     filename = file.filename
     file.save(os.path.join('E:/Projects/Neuro-Diagnostic/', filename))
-    img =  process_single_img(os.path.join('E:/Projects/Neuro-Diagnostic/', filename))
-    model = keras.models.load_model('E:/Projects/Neuro-Diagnostic/Models/Alzheimers/FineTunedModelNoAugment.h5')
+    img =  preprocessing.process_single_img(os.path.join('E:/Projects/Neuro-Diagnostic/', filename))
+    model = keras.models.load_model('E:/Projects/Neuro-Diagnostic/Models/FineTunedModelNoAugment.h5')
     prediction = model.predict(img)
-    return str(prediction)
-
-
+    return str(np.argmax(prediction))
 
 if __name__ == '__main__':
     app.run(debug=True)
 
-# @app.route('/scanCancer', methods = ['GET', 'POST'])
-# def scan_cancer()

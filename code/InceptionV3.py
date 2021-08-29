@@ -29,11 +29,9 @@ model = keras.models.Sequential()
 model.add(conv_base)
 model.add(layers.Flatten())
 model.add(layers.Dense(512, activation='relu'))
-model.add(layers.Dropout(0.8))
-model.add(layers.Dense(512, activation='relu'))
+model.add(layers.Dropout(0.3))
 model.add(layers.Dense(3, activation = 'softmax'))
 
-model.build(input_shape=(8, 440,344,3))
 
 optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001, decay=1e-3)
 model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics = ['accuracy'])
@@ -68,7 +66,7 @@ optimizer = tf.keras.optimizers.Adam(learning_rate=0.0001, decay=1e-7)
 model.compile(optimizer=optimizer, loss='sparse_categorical_crossentropy', metrics = ['accuracy'])
 history = model.fit(training_set, epochs = 70, steps_per_epoch=95/8, batch_size=8, validation_data=val_set, validation_steps=19/8)
 
-model.save('E:/Projects/Neuro-Diagnostic/Models/Alzheimers/NoAugmentNoFineTuneBalanced.h5')
+model.save('E:/Projects/Neuro-Diagnostic/Models/Alzheimers/NoAugmentFineTunedBalancedFinal.h5')
 
 plt.plot(history.history['accuracy'], label='accuracy')
 plt.plot(history.history['val_accuracy'], label = 'val_accuracy')
@@ -82,7 +80,8 @@ plt.show()
 model.evaluate(test_set)
 
 model = keras.models.load_model('E:/Projects/Neuro-Diagnostic/Models/FineTunedModelNoAugment.h5')
-
+model.summary()
+model.evaluate(test_set)
 
 def calculate_auc(model, test_set):
 

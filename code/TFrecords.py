@@ -1,4 +1,4 @@
-from constants import AUTOTUNE
+import constants
 import tensorflow as tf
 import SimpleITK as sitk
 import numpy as np
@@ -125,8 +125,8 @@ def create_tfrecord_dataset(filename, set_type):
     dataset = dataset.batch(constants.BATCH_SIZE)
     # let runtime decide on optimal prefetch to increase performance
     dataset = dataset.prefetch(buffer_size=constants.AUTOTUNE)
-    # if set_type == 'train' or set_type == 'val':
-    #     dataset = dataset.repeat()
+    if set_type == 'train' or set_type == 'val':
+        dataset = dataset.repeat()
     return dataset
 
 

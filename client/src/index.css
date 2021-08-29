@@ -1,13 +1,39 @@
-body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+
+.appHeader{
+    padding-bottom: 15px;
+    font-size:64px;
+    filter: drop-shadow(30px 10px 4px black );
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+.diagnosisHeader{
+    font-size:64px;
+}
+
+
+.appHeader{
+    padding-bottom: 15px;
+    font-size:64px;
+    filter: drop-shadow(30px 10px 4px black );
+}
+
+.btn{
+    width:80px;
+}
+
+.homePage {
+    background-image: url('E:/Projects/Neuro-Diagnostic/client/src/Components/Images/background.jpg');
+    display:flex;
+    flex-direction: column;
+    min-height:100vh;
+    justify-content: center;
+    align-items: center;
+    color: yellow;
+}
+
+.diagnosis{
+    background-image: url('E:/Projects/Neuro-Diagnostic/client/src/Components/Images/scanResultBackground.jpg');
+    min-height: 100vh;
+    display:flex;
+    justify-content: center;
+    align-items: center;
 }
