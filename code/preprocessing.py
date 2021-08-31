@@ -1,5 +1,6 @@
 # This file contains the main steps used to process the ADNI images and organize them into folders based on their labels
 
+from itk.support.extras import origin
 import numpy as np
 import SimpleITK as sitk
 import matplotlib.pyplot as plt
@@ -16,6 +17,7 @@ import dltk.io.preprocessing
 import dltk.io.augmentation
 from nipype.interfaces.fsl import BET
 from PIL import Image
+from tensorflow.python.framework.type_spec import register
 import TFrecords
 import constants
 
@@ -79,6 +81,7 @@ def register_img(sitk_fixed, sitk_moving):
     elastix_object.UpdateLargestPossibleRegion()
     result_image = elastix_object.GetOutput()
     return result_image
+    result_transform_parameters = elastix_object.GetTransformParameterObject()
 
 def register_and_save(filename, path, atlas, description_csv):
     # # seperate filename by "_"
@@ -145,7 +148,7 @@ def convert_to_2D(img):
         cut_iterator -= 2
 
         # moves to the next column if the cut amount is 4, 8, 12, or 16
-        if (cut_amount in [4, 8, 12, 16]):
+        if (cut_amount in [4, 8, 12]):
             row_iterator = 0
             col_iterator += cut.shape[1]
 
@@ -161,7 +164,8 @@ def convert_to_2D(img):
 
 # loads 2D image with the corresponding label, used for generation of datasets
 def load_2D_with_label(img_path):
-    label = constants.LABEL_MAP[(img_path.split('/')[-2])]
+    label = ""
+    #label = constants.LABEL_MAP[(img_path.split('/')[-2])]
     sitk_img = sitk.ReadImage(img_path)
     img = sitk.GetArrayFromImage(sitk_img)
     # image whitening is applied
@@ -172,29 +176,29 @@ def load_2D_with_label(img_path):
     return img, label
 
 # generates a 2D image from a preprocessed sitk image, used for running a trained model
-def load_2D_no_label(sitk_image):
-    img = sitk.GetArrayFromImage(sitk_image)
+def load_2D_no_label(itk_image):
+    img = itk.GetArrayFromImage(itk_image)
     img = dltk.io.preprocessing.whitening(img)
     return convert_to_2D(img)
 
 # processes a single image to feed into a trained model
 # takes in a nii file
 def process_single_img(file):
-    sitk_img = sitk.ReadImage(file)
-    # resamples the sitk image
-    resampled_sitk = resample_img(sitk_img)
-    sitk_atlas = sitk.ReadImage(constants.ATLAS)
-    # resamples sitk atlas
-    resampled_atlas = resample_img(sitk_atlas)
-    # registers image
-    registered_itk = register_img(resampled_sitk, resampled_atlas)
-    # converts registered image from itk to sitk
-    registered_sitk = itk_to_sitk(registered_itk)
-    image_2D = load_2D_no_label(registered_sitk)
+    original_atlas = sitk.ReadImage(constants.ATLAS)
+    resampled_atlas = resample_img(original_atlas)
+    original_img = sitk.ReadImage(file)
+    resampled_img = resample_img(original_img)
+    registered_img = register_img(resampled_atlas, resampled_img)
+    img = itk.GetArrayFromImage(registered_img)
+    img = dltk.io.preprocessing.whitening(img)
+    image_2D = convert_to_2D(img)
+
     # reshapes image for feeding into model
+    # plt.imshow(img)
+    # plt.show()
     image_2D = np.reshape(image_2D, (440, 344, 3))
     image_2D = np.expand_dims(image_2D, axis=0)
     return image_2D
 
-#process_single_img('E:/Projects/Neuro-Diagnostic/ADNI/Registered/AD/ADNI_141_S_1024_MR_MPR__GradWarp__B1_Correction__N3__Scaled_Br_20070402181417383_S22699_I47748.nii')
+img = process_single_img('E:/Projects/Neuro-Diagnostic/ADNI/Original/Annual 2 Yr 3T/023_S_1247/MPR__GradWarp__B1_Correction__N3__Scaled/2007-02-21_14_10_43.0/S26861/ADNI_023_S_1247_MR_MPR__GradWarp__B1_Correction__N3__Scaled_Br_20070427204139431_S26861_I52138.nii')
 

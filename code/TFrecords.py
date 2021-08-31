@@ -43,7 +43,7 @@ tfrecord_test = os.path.join(constants.TFRECORD_PATH, constants.TFRECORD_TEST)
 def write_to_tf_record(filenames, record_name):
     writer = tf.io.TFRecordWriter(record_name)
     for file in filenames:
-        img, label = preprocessing.load_2D_image(file)
+        img, label = preprocessing.load_2D_with_label(file)
         print(label)
 
         # create feature mapping for the Example
