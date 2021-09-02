@@ -2,7 +2,7 @@
 
 Home Page            |  Scan Result
 :-------------------------:|:-------------------------:
-![HomePage](assets/HomePage.jpg)  |  ![ScanResult](assets/ScanResult.jpg)
+![HomePage](assets/HomePage.JPG)  |  ![ScanResult](assets/ScanResult.JPG)
 
 ## Inspiration ❗
 Alzheimer's disease is the most common type of dementia, and can lead to the loss of the ability to carry on a conversation and respond to the environment. Neuroscientists can spend hours studying scans and various biomarkers to accurately diagnose patients with early stages of Alzheimer's. However, with the rapid advancement of machine learning software I reasoned that there must be more efficient ways to diagnose a patient with Alheimer's using imaging technolgies like MRI.
