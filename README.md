@@ -1,11 +1,5 @@
 # Neuro-Diagnostic
 
-Home Page            |  Scan Result
-:-------------------------:|:-------------------------:
-![HomePage](assets/HomePage.JPG)  |  ![ScanResult](assets/ScanResult.JPG)
-
-![HomePage](assets/HomePage.JPG) ![ScanResult](assets/ScanResult.JPG)
-
 ## Inspiration ❗
 Alzheimer's disease is the most common type of dementia, and can lead to the loss of the ability to carry on a conversation and respond to the environment. Neuroscientists can spend hours studying scans and various biomarkers to accurately diagnose patients with early stages of Alzheimer's. However, with the rapid advancement of machine learning software I reasoned that there must be more efficient ways to diagnose a patient with Alheimer's using imaging technolgies like MRI.
 
@@ -13,7 +7,7 @@ Alzheimer's disease is the most common type of dementia, and can lead to the los
 Neuro-Diagnostic accepts a patients MRI scan and runs it through a multi-classification machine learning model to output whether the patiens is cognitively normal, mildly cognatively impaired, or has Alzheimer's. 
 
 ## How I built it ❓
-This app was built using only Python for the computational logic, with a Flask backend complemented by a simple React frontend. Once a user uploads an MRI scan in the form of a 3D NIFTI file, the image gets passed through the preprocessing pipeline. In the pipeline the image is resampled, registered to a common atlas, whitened, and finally converted to a 2D image by taking multiple slices at different regions of the brain. To aid in preproccessing various libraries and open source tools were utilized, including SimpleITK and The Deep Learning Toolkit for Medical Imaging(DLTK). The processed 2D images are then written to TFRecords and made into a dataset upon which a CNN is trained. 
+This app was built using only Python for the computational logic, with a Flask backend complemented by a simple React frontend. Once a user uploads an MRI scan in the form of a 3D NIFTI file, the image gets passed through the preprocessing pipeline. In the pipeline the image is resampled, registered to a common atlas, whitened, and finally converted to a 2D image by taking multiple slices at different regions of the brain. The machine learning model is then ran on the image. All training images were taken from the ADNI database. To aid in preproccessing various libraries and open source tools were utilized, including SimpleITK and The Deep Learning Toolkit for Medical Imaging(DLTK). The processed 2D images are then written to TFRecords and made into a dataset upon which a CNN is trained. 
 
 Post Processed 2D(Cognitavely Normal) |  Post Processed 2D(Alzheimer's)
 :-------------------------:|:-------------------------:
@@ -36,4 +30,6 @@ I learned many different things by working on this project. Some of these includ
 ## What's next for Neuro-Diagnostic ▶️
 The next planned step is to implement the ability to diagnose brain cancer. 
 
+## Sources
+I relied on various sources, chiefly Oscar Plasencia's "Alzeimer Diagnosis with Deep Learning" articles, as well as a guide from DLTK, for guidance on preprocessing MRI scans. 
 

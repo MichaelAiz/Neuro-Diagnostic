@@ -24,8 +24,6 @@ conv_base = keras.applications.inception_v3.InceptionV3(weights = 'imagenet', in
 # freeze the InceptionV3 network
 conv_base.trainable = False
 
-
-
 model = keras.models.Sequential()
 model.add(conv_base)
 model.add(layers.Flatten())
