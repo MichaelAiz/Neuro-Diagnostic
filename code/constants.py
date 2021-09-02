@@ -1,6 +1,5 @@
-# Local Constants
+# Local Path Constants
 import tensorflow as tf
-
 DATABASE = 'E:/Projects/Neuro-Diagnostic/ADNI/Original/'
 DB_SUBFOLDERS = ['Complete 2Yr 1.5T/', 'Complete 3Yr 1.5T/', 'Screening_1.5T/']
 REGISTERED_DB = 'E:/Projects/Neuro-Diagnostic/ADNI/Registered/'
@@ -11,6 +10,8 @@ TFRECORD_DB = "E:/Projects/Neuro-Diagnostic/ADNI/TFRecords"
 TFRECORD_TRAIN = "E:/Projects/Neuro-Diagnostic/TFRecords/train.tfrecords"
 TFRECORD_TEST = "E:/Projects/Neuro-Diagnostic/TFRecords/test.tfrecords"
 TFRECORD_VAL = "E:/Projects/Neuro-Diagnostic/TFRecords/validation.tfrecords"
+SAVE_IMAGE_PATH = 'E:/Projects/Neuro-Diagnostic/'
+MODEL = 'E:/Projects/Neuro-Diagnostic/Models/FineTunedModelNoAugment.h5'
 
 # Tensorflow Constants
 AUTOTUNE = tf.data.AUTOTUNE

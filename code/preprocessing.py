@@ -18,7 +18,6 @@ import dltk.io.augmentation
 from nipype.interfaces.fsl import BET
 from PIL import Image
 from tensorflow.python.framework.type_spec import register
-import TFrecords
 import constants
 
 # image is resampled to a common isotropic resolution of 2mm^3
@@ -81,7 +80,6 @@ def register_img(sitk_fixed, sitk_moving):
     elastix_object.UpdateLargestPossibleRegion()
     result_image = elastix_object.GetOutput()
     return result_image
-    result_transform_parameters = elastix_object.GetTransformParameterObject()
 
 def register_and_save(filename, path, atlas, description_csv):
     # # seperate filename by "_"
@@ -158,28 +156,20 @@ def convert_to_2D(img):
                 img_2D[i + row_iterator, j + col_iterator] = cut[i, j]
         row_iterator += cut.shape[0]
     
-
+    # image is changed to a 3-channel format since this is standard for most models
     return np.repeat(img_2D[None, ...], 3, axis = 0).T
 
 
 # loads 2D image with the corresponding label, used for generation of datasets
 def load_2D_with_label(img_path):
-    label = ""
-    #label = constants.LABEL_MAP[(img_path.split('/')[-2])]
+    label = constants.LABEL_MAP[(img_path.split('/')[-2])]
     sitk_img = sitk.ReadImage(img_path)
     img = sitk.GetArrayFromImage(sitk_img)
     # image whitening is applied
     img = dltk.io.preprocessing.whitening(img)
 
     img = convert_to_2D(img)
-    print("Next Image")
     return img, label
-
-# generates a 2D image from a preprocessed sitk image, used for running a trained model
-def load_2D_no_label(itk_image):
-    img = itk.GetArrayFromImage(itk_image)
-    img = dltk.io.preprocessing.whitening(img)
-    return convert_to_2D(img)
 
 # processes a single image to feed into a trained model
 # takes in a nii file
@@ -189,16 +179,19 @@ def process_single_img(file):
     original_img = sitk.ReadImage(file)
     resampled_img = resample_img(original_img)
     registered_img = register_img(resampled_atlas, resampled_img)
+    # image registration returns an itk image, so use itk methods
     img = itk.GetArrayFromImage(registered_img)
     img = dltk.io.preprocessing.whitening(img)
     image_2D = convert_to_2D(img)
-
+    print(image_2D.shape)
+    plt.imshow(image_2D)
+    plt.show()
     # reshapes image for feeding into model
-    # plt.imshow(img)
-    # plt.show()
     image_2D = np.reshape(image_2D, (440, 344, 3))
+    plt.imshow(image_2D)
+    plt.show()
     image_2D = np.expand_dims(image_2D, axis=0)
     return image_2D
 
-img = process_single_img('E:/Projects/Neuro-Diagnostic/ADNI/Original/Annual 2 Yr 3T/023_S_1247/MPR__GradWarp__B1_Correction__N3__Scaled/2007-02-21_14_10_43.0/S26861/ADNI_023_S_1247_MR_MPR__GradWarp__B1_Correction__N3__Scaled_Br_20070427204139431_S26861_I52138.nii')
+img = process_single_img('E:/Projects/Neuro-Diagnostic/ADNI\Original/Annual 2 Yr 3T/136_S_0426/MPR____N3__Scaled/2006-05-30_10_46_09.0/S15017/ADNI_136_S_0426_MR_MPR____N3__Scaled_Br_20070215213410384_S15017_I40378.nii')
 

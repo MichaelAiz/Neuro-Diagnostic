@@ -7,9 +7,8 @@ import os
 from flask_cors import CORS
 from flask import Flask, request, flash, redirect, render_template
 from PIL import Image
-
-
 sys.path.append('E:/Projects/Neuro-Diagnostic/Code/')
+from Code import constants
 from Code import TFrecords
 from Code import preprocessing
 
@@ -25,10 +24,13 @@ def scan_alzheimers():
         return redirect(request.url)
     file = request.files['file']
     filename = file.filename
-    file.save(os.path.join('E:/Projects/Neuro-Diagnostic/', filename))
-    img = preprocessing.process_single_img(os.path.join('E:/Projects/Neuro-Diagnostic/', filename))
-    model = keras.models.load_model('E:/Projects/Neuro-Diagnostic/Models/FineTunedModelNoAugment.h5')
+    # save image file to disk
+    file.save(os.path.join(constants.SAVE_IMAGE_PATH, filename))
+    # read image file from disk, process, and feed to model
+    img = preprocessing.process_single_img(os.path.join(constants.SAVE_IMAGE_PATH, filename))
+    model = keras.models.load_model(constants.MODEL)
     prediction = model.predict(img)
+    # returns the index of the class with the largest probability
     return str(np.argmax(prediction))
 
 if __name__ == '__main__':
